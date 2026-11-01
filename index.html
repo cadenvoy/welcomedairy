@@ -13,13 +13,13 @@
   --text: #111111;
   --dim: #888888;
   --border: #EAEAEA;
-  --accent: #00E5FF; /* 默认品牌青蓝色 */
-  --drawer-accent: #00E5FF; /* 抽屉内动态颜色 */
+  --accent: #00E5FF;
+  --drawer-accent: #00E5FF;
   --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --font-mono: "Courier New", Courier, monospace;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; width: 100%; }
 body {
   font-family: var(--font-sans);
   background: var(--bg);
@@ -37,7 +37,85 @@ button {
 img { display: block; max-width: 100%; }
 p, h1, h2 { margin: 0; }
 
-/* ========== App 容器 ========== */
+/* =========================================================
+   初始等待页 (Welcome Screen) - 已修复横屏溢出
+   ========================================================= */
+#welcomeScreen {
+  position: fixed; top: 0; left: 0; 
+  width: 100vw; height: 100vh; height: 100dvh;
+  z-index: 100;
+  background: #FFFFFF;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+  overflow: hidden; /* 绝对防止横向溢出 */
+}
+#welcomeScreen.fade-out {
+  opacity: 0; visibility: hidden; pointer-events: none;
+}
+
+/* 底部漂浮彩色装饰容器 */
+.welcome-bg {
+  position: absolute;
+  left: 0; top: 0; 
+  width: 100vw; height: 65vh; /* 高度加大到65% */
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to top, black 10%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 10%, transparent 100%);
+}
+
+/* 漂浮的单个彩色图形 */
+.bg-float-item {
+  position: absolute;
+  animation: welcomeFloat 8s ease-in-out infinite alternate;
+  transform: rotate(var(--base-rot)) translateY(0);
+}
+.bg-float-item img {
+  width: 100%; height: 100%; object-fit: contain;
+  opacity: 0.35; /* 半透明 */
+  filter: blur(2px); /* 模糊制造景深 */
+}
+@keyframes welcomeFloat {
+  0%   { transform: rotate(var(--base-rot)) translate(0, 0); }
+  50%  { transform: rotate(calc(var(--base-rot) + 20deg)) translate(15px, -20px); }
+  100% { transform: rotate(calc(var(--base-rot) - 15deg)) translate(-10px, 10px); }
+}
+
+/* 居中内容区 */
+.welcome-content {
+  position: relative; z-index: 2;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 20px;
+}
+.welcome-title {
+  font-size: clamp(48px, 15vw, 80px);
+  font-weight: 900; line-height: 1.1;
+  letter-spacing: -2px; color: var(--text);
+  margin-bottom: 50px;
+}
+.start-btn {
+  padding: 14px 44px;
+  border-radius: 40px;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-size: 16px; font-weight: 600;
+  letter-spacing: 2px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 229, 255, 0.15);
+}
+.start-btn:active {
+  background: var(--accent);
+  color: #000;
+  transform: scale(0.95);
+}
+
+/* =========================================================
+   手机主应用布局
+   ========================================================= */
 .app {
   max-width: 480px; margin: 0 auto;
   padding: 0 20px calc(24px + env(safe-area-inset-bottom));
@@ -68,7 +146,6 @@ p, h1, h2 { margin: 0; }
   width: 36px; height: 36px; border-radius: 50%;
   border: 1.5px solid var(--accent); color: var(--accent);
   font-size: 18px; display: grid; place-items: center;
-  transition: background .15s;
 }
 .nav-btn:active { background: rgba(0, 229, 255, 0.1); }
 .today-btn {
@@ -151,7 +228,7 @@ p, h1, h2 { margin: 0; }
 }
 .overlay.show { opacity: 1; pointer-events: auto; }
 
-/* ========== 抽屉 ========== */
+/* ========== 抽屉（手机端底部滑出） ========== */
 .drawer {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
   background: var(--bg);
@@ -194,7 +271,7 @@ p, h1, h2 { margin: 0; }
   transition: background-color .2s;
 }
 
-/* 今日贴纸列表 */
+/* 贴纸列表 */
 .sticker-list { display: flex; flex-wrap: wrap; gap: 8px; min-height: 22px; }
 .sticker-list .empty { font-family: var(--font-mono); font-size: 11px; color: #CCCCCC; }
 .sticker-item {
@@ -207,7 +284,7 @@ p, h1, h2 { margin: 0; }
 .si-del { color: #CCCCCC; font-size: 16px; padding: 0 4px; }
 .si-del:active { color: var(--drawer-accent); }
 
-/* 颜色选择 */
+/* 颜色 */
 .color-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
 .color-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -233,7 +310,6 @@ p, h1, h2 { margin: 0; }
 .ci-name { font-family: var(--font-mono); font-size: 10px; color: var(--dim); transition: color .2s; }
 .color-item.selected .ci-name { color: #111; font-weight: bold; }
 
-/* 标语框 */
 .slogan-box {
   margin-top: 12px; padding: 14px;
   border: 1px dashed var(--border);
@@ -277,10 +353,10 @@ p, h1, h2 { margin: 0; }
 
 /* 弹簧动画 */
 @keyframes springPop {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.18); }
-  70%  { transform: scale(0.92); }
-  85%  { transform: scale(1.04); }
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  70% { transform: scale(0.92); }
+  85% { transform: scale(1.04); }
   100% { transform: scale(1); }
 }
 .shape-btn.pop { animation: springPop 0.5s cubic-bezier(.34,1.56,.64,1); z-index: 1; }
@@ -351,14 +427,20 @@ p, h1, h2 { margin: 0; }
 .pv-cancel { background: #F5F5F5; color: var(--text); }
 .pv-save { background: var(--accent); color: #000; }
 .pv-save:disabled { background: #CCC; color: #FFF; }
-
-@media (min-width: 480px) {
-  .app, .drawer { max-width: 560px; }
-}
 </style>
 </head>
 <body>
 
+<!-- 初始等待页 -->
+<div id="welcomeScreen">
+  <div class="welcome-bg" id="welcomeBg"></div>
+  <div class="welcome-content">
+    <h1 class="welcome-title">此刻欢迎光临</h1>
+    <button class="start-btn" id="startBtn">开始记录</button>
+  </div>
+</div>
+
+<!-- 主应用 -->
 <div class="app">
   <header class="topbar">
     <h1 class="huge-title">此刻<br>欢迎光临</h1>
@@ -480,7 +562,10 @@ const pad2 = n => String(n).padStart(2, '0');
 const keyOf = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 const colorObj = id => COLORS.find(c => c.id === id);
 const shapeObj = id => SHAPES.find(s => s.id === id);
+
+// 适配 /welcomedairy 路径
 const imgSrc = (color, shape) => `/welcomedairy/${color}_${shape}.png`;
+
 const WEEK_CHARS = '日一二三四五六';
 
 let data = { version: 1, days: {} };
@@ -502,9 +587,50 @@ function saveData() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) { alert('保存失败'); }
 }
 
-/* =========================================================
-   主页面渲染
-   ========================================================= */
+/* 等待页逻辑 - 放大图形 */
+function initWelcomeBg() {
+  const bg = $('#welcomeBg');
+  // 稍微减少数量，让单个图形有更大的展示空间
+  const count = 15; 
+  for (let i = 0; i < count; i++) {
+    const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    
+    const el = document.createElement('div');
+    el.className = 'bg-float-item';
+    
+    // 🚀 核心改动：尺寸放大到 100px - 250px 之间！
+    const size = 100 + Math.random() * 150;
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    
+    // 随机位置，允许一部分超出屏幕产生张力
+    el.style.left = (Math.random() * 100 - 10) + '%';
+    el.style.bottom = (Math.random() * 40 - 10) + 'px';
+    
+    const rot = (Math.random() - 0.5) * 90;
+    el.style.setProperty('--base-rot', rot + 'deg');
+    
+    el.style.animationDelay = (Math.random() * -8) + 's';
+    el.style.animationDuration = (6 + Math.random() * 6) + 's';
+    
+    const img = new Image();
+    img.src = imgSrc(color.id, shape.id);
+    img.onerror = () => { el.style.display = 'none'; }; 
+    
+    el.appendChild(img);
+    bg.appendChild(el);
+  }
+}
+
+$('#startBtn').onclick = () => {
+  const ws = $('#welcomeScreen');
+  ws.classList.add('fade-out');
+  setTimeout(() => { ws.remove(); }, 800);
+};
+
+
+/* 主页面渲染 */
 function renderDayView() {
   const dateKey = keyOf(viewDate);
   const isToday = dateKey === keyOf(new Date());
@@ -528,7 +654,7 @@ function renderDayView() {
 
     const cols = 3;
     const rowHeight = 130; 
-    const colWidth = 100;   
+    const colWidth = 100; 
     
     const rows = Math.ceil(list.length / cols);
     gallery.style.height = (rows * rowHeight + 40) + 'px';
@@ -569,9 +695,7 @@ function renderDayView() {
   }
 }
 
-/* =========================================================
-   抽屉渲染
-   ========================================================= */
+/* 抽屉渲染 */
 function openDrawer(dateKey) {
   activeDate = dateKey;
   selColor = null;
@@ -800,9 +924,7 @@ function removeSticker(idx) {
   updateUI();
 }
 
-/* =========================================================
-   明信片生成与预览 (修复重开崩溃问题)
-   ========================================================= */
+/* 明信片生成 */
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -930,17 +1052,15 @@ async function openPostcardPreview(dateKey) {
   if (!canvas) return;
 
   let dataUrl = null;
-  try { dataUrl = canvas.toDataURL('image/png'); } catch (e) { console.warn('Canvas 被污染（本地 file:// 协议）', e); }
+  try { dataUrl = canvas.toDataURL('image/png'); } catch (e) { console.warn('Canvas 被污染', e); }
 
   const overlay = $('#previewOverlay');
   const saveBtn = $('#previewSave');
   
-  // 【核心修复】强制清空之前的节点，重新构建
   const wrap = document.querySelector('.preview-img-wrap');
   wrap.innerHTML = '';
   
   if (dataUrl) {
-    // 正常模式，用 img 展示
     const newImg = document.createElement('img');
     newImg.alt = '明信片预览';
     newImg.src = dataUrl;
@@ -954,7 +1074,6 @@ async function openPostcardPreview(dateKey) {
       hidePreview();
     };
   } else {
-    // 降级模式（本地直接双击打开），直接用 canvas 展示供截图
     canvas.style.maxWidth = '100%';
     canvas.style.maxHeight = '65dvh';
     canvas.style.borderRadius = '4px';
@@ -985,9 +1104,7 @@ function downloadDataUrl(dataUrl, filename) {
   a.remove();
 }
 
-/* =========================================================
-   杂项
-   ========================================================= */
+/* 杂项 */
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1031,9 +1148,7 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
 
-/* =========================================================
-   事件绑定
-   ========================================================= */
+/* 事件绑定 */
 function bindEvents() {
   $('#prevDay').onclick = () => { viewDate.setDate(viewDate.getDate() - 1); renderDayView(); };
   $('#nextDay').onclick = () => { viewDate.setDate(viewDate.getDate() + 1); renderDayView(); };
@@ -1065,6 +1180,7 @@ function bindEvents() {
 }
 
 function init() {
+  initWelcomeBg();
   loadData();
   viewDate = new Date();
   bindEvents();
