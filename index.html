@@ -480,7 +480,7 @@ const pad2 = n => String(n).padStart(2, '0');
 const keyOf = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 const colorObj = id => COLORS.find(c => c.id === id);
 const shapeObj = id => SHAPES.find(s => s.id === id);
-const imgSrc = (color, shape) => `images/${color}_${shape}.png`;
+const imgSrc = (color, shape) => `/${color}_${shape}.png`;
 const WEEK_CHARS = '日一二三四五六';
 
 let data = { version: 1, days: {} };
