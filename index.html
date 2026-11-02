@@ -54,7 +54,6 @@ p, h1, h2 { margin: 0; }
   opacity: 0; visibility: hidden; pointer-events: none;
 }
 
-/* 底部漂浮彩色装饰容器（限制在下半屏，防止遮挡文字） */
 .welcome-bg {
   position: absolute;
   left: 0; right: 0; bottom: 0;
@@ -65,7 +64,6 @@ p, h1, h2 { margin: 0; }
   -webkit-mask-image: linear-gradient(to top, black 20%, transparent 100%);
 }
 
-/* 漂浮的单个彩色图形 */
 .bg-float-item {
   position: absolute;
   animation: welcomeFloat 8s ease-in-out infinite alternate;
@@ -82,7 +80,6 @@ p, h1, h2 { margin: 0; }
   100% { transform: rotate(calc(var(--base-rot) - 15deg)) translate(-10px, 10px); }
 }
 
-/* 居中内容区 */
 .welcome-content {
   position: relative; z-index: 2;
   text-align: center;
@@ -108,14 +105,10 @@ p, h1, h2 { margin: 0; }
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   box-shadow: 0 4px 20px rgba(0, 229, 255, 0.15);
 }
-.start-btn:active {
-  background: var(--accent);
-  color: #000;
-  transform: scale(0.95);
-}
+.start-btn:active { background: var(--accent); color: #000; transform: scale(0.95); }
 
 /* =========================================================
-   手机主应用布局
+   主应用
    ========================================================= */
 .app {
   max-width: 480px; margin: 0 auto;
@@ -123,8 +116,6 @@ p, h1, h2 { margin: 0; }
   min-height: 100dvh; display: flex; flex-direction: column;
   position: relative;
 }
-
-/* ========== 顶部与标题 ========== */
 .topbar {
   position: sticky; top: 0; z-index: 5;
   padding: calc(20px + env(safe-area-inset-top)) 0 12px;
@@ -155,7 +146,7 @@ p, h1, h2 { margin: 0; }
 }
 .today-btn:active { background: rgba(0, 229, 255, 0.1); }
 
-/* ========== 主页面画廊 ========== */
+/* 主页面画廊 */
 .gallery-wrap {
   flex: 1; position: relative; min-height: 60vh;
   padding-top: 12px; cursor: pointer;
@@ -175,10 +166,18 @@ p, h1, h2 { margin: 0; }
   display: grid; place-items: center;
   animation: floatRotate 4s ease-in-out infinite alternate;
   transform: rotate(var(--base-rot)) translate(0, 0); 
+  transition: transform 0.2s;
 }
+.gallery-item:hover { transform: scale(1.05) !important; z-index: 10; }
 .gallery-item img { width: 100%; height: 100%; object-fit: contain; }
 .gallery-item.failed { border-radius: 50%; background: #F0F0F0; }
 .gallery-item.failed img { display: none; }
+/* 有故事的贴纸加个小光晕或圆点提示 */
+.gallery-item.has-story::after {
+  content: ''; position: absolute; top: 10px; right: 10px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 6px var(--accent);
+}
 
 @keyframes floatRotate {
   0%   { transform: rotate(var(--base-rot)) translate(0, 0); }
@@ -186,7 +185,7 @@ p, h1, h2 { margin: 0; }
   100% { transform: rotate(calc(var(--base-rot) - 6deg)) translate(-6px, 6px); }
 }
 
-/* ========== 悬浮按钮 ========== */
+/* 悬浮按钮 */
 .fab-add {
   position: fixed;
   bottom: calc(30px + env(safe-area-inset-bottom));
@@ -199,7 +198,7 @@ p, h1, h2 { margin: 0; }
 .fab-add:active { transform: scale(0.9); }
 .fab-add svg { width: 28px; height: 28px; stroke-width: 2.5; }
 
-/* ========== 导出今日此刻按钮 ========== */
+/* 导出按钮 */
 .export-day-btn {
   position: fixed; left: 50%; transform: translateX(-50%);
   bottom: calc(30px + env(safe-area-inset-bottom));
@@ -212,7 +211,7 @@ p, h1, h2 { margin: 0; }
 }
 .export-day-btn:active { transform: translate(-50%, 2px); background: rgba(0, 229, 255, 0.1); }
 
-/* ========== 底部 ========== */
+/* 底部 */
 .app-footer {
   padding: 80px 0 10px; text-align: center; 
   font-family: var(--font-mono); font-size: 10px; color: #CCCCCC;
@@ -221,7 +220,7 @@ p, h1, h2 { margin: 0; }
 .text-btn:active { background: #F5F5F5; }
 .dot-sep { opacity: .5; margin: 0 2px; }
 
-/* ========== 遮罩 ========== */
+/* 通用遮罩 */
 .overlay {
   position: fixed; inset: 0; z-index: 20;
   background: rgba(0,0,0,.2);
@@ -229,7 +228,9 @@ p, h1, h2 { margin: 0; }
 }
 .overlay.show { opacity: 1; pointer-events: auto; }
 
-/* ========== 抽屉（手机端底部滑出） ========== */
+/* =========================================================
+   抽屉（添加贴纸）
+   ========================================================= */
 .drawer {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
   background: var(--bg);
@@ -241,38 +242,16 @@ p, h1, h2 { margin: 0; }
   box-shadow: 0 -4px 30px rgba(0,0,0,.08);
 }
 .drawer.show { transform: translateY(0); }
-.drawer-handle {
-  width: 36px; height: 4px; border-radius: 2px;
-  background: #E0E0E0; margin: 10px auto 0; flex-shrink: 0;
-}
-.drawer-head {
-  padding: 12px 24px 12px; display: flex; align-items: flex-start;
-  justify-content: space-between; gap: 10px; flex-shrink: 0;
-}
+.drawer-handle { width: 36px; height: 4px; border-radius: 2px; background: #E0E0E0; margin: 10px auto 0; flex-shrink: 0; }
+.drawer-head { padding: 12px 24px 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-shrink: 0; }
 .drawer-date { font-size: 18px; font-weight: 800; font-family: var(--font-mono); }
 .drawer-sub { font-size: 12px; color: var(--dim); margin-top: 2px; }
-.close-btn {
-  width: 30px; height: 30px; border-radius: 50%; font-size: 22px;
-  color: var(--dim); display: grid; place-items: center;
-}
-.drawer-body {
-  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
-  padding: 4px 24px 24px; overscroll-behavior: contain;
-}
-
+.close-btn { width: 30px; height: 30px; border-radius: 50%; font-size: 22px; color: var(--dim); display: grid; place-items: center; }
+.drawer-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 4px 24px 24px; overscroll-behavior: contain; }
 .dsec { margin-top: 24px; }
-.dsec-title {
-  font-family: var(--font-mono); font-size: 11px; color: var(--dim);
-  margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase;
-  display: flex; align-items: center; gap: 8px;
-}
-.dsec-count {
-  background: var(--drawer-accent); color: #000;
-  font-size: 9px; padding: 1px 6px; border-radius: 8px; font-weight: bold;
-  transition: background-color .2s;
-}
+.dsec-title { font-family: var(--font-mono); font-size: 11px; color: var(--dim); margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.dsec-count { background: var(--drawer-accent); color: #000; font-size: 9px; padding: 1px 6px; border-radius: 8px; font-weight: bold; transition: background-color .2s; }
 
-/* 贴纸列表 */
 .sticker-list { display: flex; flex-wrap: wrap; gap: 8px; min-height: 22px; }
 .sticker-list .empty { font-family: var(--font-mono); font-size: 11px; color: #CCCCCC; }
 .sticker-item {
@@ -285,7 +264,7 @@ p, h1, h2 { margin: 0; }
 .si-del { color: #CCCCCC; font-size: 16px; padding: 0 4px; }
 .si-del:active { color: var(--drawer-accent); }
 
-/* 颜色 */
+/* 颜色选择 */
 .color-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
 .color-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -294,20 +273,9 @@ p, h1, h2 { margin: 0; }
   transition: all .2s;
 }
 .color-item:active { transform: scale(.95); }
-.color-item.selected { 
-  border-color: var(--drawer-accent); 
-  background: rgba(0,0,0,0.03);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
-}
-.color-item.selected .ci-dot {
-  box-shadow: 0 0 0 2px #FFF, 0 0 0 4px var(--drawer-accent);
-  transform: scale(1.1);
-  transition: all .2s;
-}
-.ci-dot {
-  width: 28px; height: 28px; border-radius: 50%;
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.05);
-}
+.color-item.selected { border-color: var(--drawer-accent); background: rgba(0,0,0,0.03); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.color-item.selected .ci-dot { box-shadow: 0 0 0 2px #FFF, 0 0 0 4px var(--drawer-accent); transform: scale(1.1); transition: all .2s; }
+.ci-dot { width: 28px; height: 28px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0,0,0,.05); }
 .ci-name { font-family: var(--font-mono); font-size: 10px; color: var(--dim); transition: color .2s; }
 .color-item.selected .ci-name { color: #111; font-weight: bold; }
 
@@ -318,16 +286,11 @@ p, h1, h2 { margin: 0; }
   min-height: 44px; display: grid; place-items: center;
   font-family: var(--font-mono); color: #CCCCCC; transition: all .2s;
 }
-.slogan-box.active {
-  border-style: solid; border-color: var(--drawer-accent);
-  color: #111; font-weight: bold; background: rgba(0,0,0,0.02);
-}
+.slogan-box.active { border-style: solid; border-color: var(--drawer-accent); color: #111; font-weight: bold; background: rgba(0,0,0,0.02); }
 
-/* 图形网格 */
+/* 图形选择 */
 .shape-grid-wrap { position: relative; }
-.shape-grid-wrap.locked {
-  opacity: 0.3; pointer-events: none; filter: grayscale(100%);
-}
+.shape-grid-wrap.locked { opacity: 0.3; pointer-events: none; filter: grayscale(100%); }
 .shape-grid-wrap.locked::after {
   content: '请先在上方选择心情色彩';
   position: absolute; inset: 0; display: grid; place-items: center;
@@ -341,46 +304,88 @@ p, h1, h2 { margin: 0; }
   transition: all .15s; position: relative;
 }
 .shape-btn:active { transform: scale(.9); }
-.shape-btn.selected { 
-  border-color: var(--drawer-accent); 
-  background: rgba(0,0,0,0.03); 
-}
+.shape-btn.selected { border-color: var(--drawer-accent); background: rgba(0,0,0,0.03); }
 .shape-btn img { width: 36px; height: 36px; object-fit: contain; }
 .shape-name { font-family: var(--font-mono); font-size: 9px; color: var(--text); white-space: nowrap; }
 @media (min-width: 400px) {
   .shape-btn img { width: 42px; height: 42px; }
   .shape-grid { grid-template-columns: repeat(6, 1fr); }
 }
-
-/* 弹簧动画 */
-@keyframes springPop {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.18); }
-  70% { transform: scale(0.92); }
-  85% { transform: scale(1.04); }
-  100% { transform: scale(1); }
-}
+@keyframes springPop { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 70% { transform: scale(0.92); } 85% { transform: scale(1.04); } 100% { transform: scale(1); } }
 .shape-btn.pop { animation: springPop 0.5s cubic-bezier(.34,1.56,.64,1); z-index: 1; }
 
-/* 抽屉底部 */
 .drawer-footer {
   padding: 12px 24px calc(16px + env(safe-area-inset-bottom));
   border-top: 1.5px solid var(--border);
   display: flex; align-items: center; gap: 12px; flex-shrink: 0;
 }
-.preview-mini {
-  width: 48px; height: 48px; border-radius: 8px; border: 1.5px solid var(--border);
-  display: grid; place-items: center; color: #CCC; font-family: var(--font-mono); font-size: 12px;
-}
+.preview-mini { width: 48px; height: 48px; border-radius: 8px; border: 1.5px solid var(--border); display: grid; place-items: center; color: #CCC; font-family: var(--font-mono); font-size: 12px; }
 .preview-mini img { width: 80%; height: 80%; object-fit: contain; }
-.add-btn {
-  flex: 1; padding: 14px; border-radius: 10px;
-  background: var(--drawer-accent); color: #000;
-  font-size: 14px; font-weight: bold; letter-spacing: 1px;
-  transition: all .2s;
-}
+.add-btn { flex: 1; padding: 14px; border-radius: 10px; background: var(--drawer-accent); color: #000; font-size: 14px; font-weight: bold; letter-spacing: 1px; transition: all .2s; }
 .add-btn:active:not(:disabled) { transform: scale(.98); }
 .add-btn:disabled { background: #F0F0F0; color: #CCC; letter-spacing: 0; }
+
+/* =========================================================
+   故事弹窗 (Story Modal)
+   ========================================================= */
+.story-overlay {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .25s;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.story-overlay.show { opacity: 1; pointer-events: auto; }
+
+.story-card {
+  background: #FFF; border-radius: 16px;
+  width: 100%; max-width: 400px;
+  display: flex; flex-direction: column;
+  overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  transform: translateY(20px) scale(0.95); transition: transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.story-overlay.show .story-card { transform: translateY(0) scale(1); }
+
+.story-head {
+  padding: 24px 24px 16px;
+  display: flex; align-items: center; gap: 16px;
+  border-bottom: 1px dashed var(--border);
+}
+.story-icon {
+  width: 60px; height: 60px; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: #F9F9F9; border-radius: 12px; padding: 8px;
+}
+.story-icon img { width: 100%; height: 100%; object-fit: contain; }
+.story-meta { flex: 1; }
+.story-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.story-date { font-family: var(--font-mono); font-size: 11px; color: var(--dim); }
+
+.story-body { padding: 20px 24px; }
+.story-textarea {
+  width: 100%; height: 140px;
+  padding: 12px; border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: #FAFAFA;
+  font-family: var(--font-sans); font-size: 14px; line-height: 1.6;
+  color: var(--text); resize: none; outline: none;
+  transition: border-color .2s, background .2s;
+}
+.story-textarea:focus { border-color: var(--accent); background: #FFF; }
+.story-textarea::placeholder { color: #CCCCCC; font-family: var(--font-mono); }
+
+.story-footer {
+  padding: 16px 24px 24px;
+  display: flex; gap: 12px;
+}
+.story-btn {
+  flex: 1; padding: 12px; border-radius: 10px;
+  font-size: 14px; font-weight: 600; transition: transform .1s;
+}
+.story-btn:active { transform: scale(0.96); }
+.story-cancel { background: #F5F5F5; color: var(--dim); }
+.story-save { background: var(--accent); color: #000; }
 
 /* Toast */
 .toast {
@@ -389,7 +394,7 @@ p, h1, h2 { margin: 0; }
   background: #000; color: #FFF;
   padding: 10px 18px; border-radius: 20px; font-size: 12px;
   font-family: var(--font-mono);
-  opacity: 0; pointer-events: none; transition: all .28s; z-index: 30;
+  opacity: 0; pointer-events: none; transition: all .28s; z-index: 60;
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
@@ -484,6 +489,7 @@ p, h1, h2 { margin: 0; }
 
 <div class="overlay" id="overlay"></div>
 
+<!-- 添加贴纸抽屉 -->
 <section class="drawer" id="drawer" role="dialog" aria-modal="true">
   <div class="drawer-handle"></div>
   <header class="drawer-head">
@@ -523,6 +529,27 @@ p, h1, h2 { margin: 0; }
   </footer>
 </section>
 
+<!-- 故事弹窗 -->
+<div class="story-overlay" id="storyOverlay">
+  <div class="story-card">
+    <div class="story-head">
+      <div class="story-icon" id="storyIcon"></div>
+      <div class="story-meta">
+        <h3 class="story-title" id="storyTitle">记录此刻</h3>
+        <p class="story-date" id="storyDate">—</p>
+      </div>
+    </div>
+    <div class="story-body">
+      <textarea class="story-textarea" id="storyInput" placeholder="写下今天发生的故事..."></textarea>
+    </div>
+    <div class="story-footer">
+      <button class="story-btn story-cancel" id="storyCancel">关闭</button>
+      <button class="story-btn story-save" id="storySave">保存故事</button>
+    </div>
+  </div>
+</div>
+
+<!-- 明信片预览 -->
 <div class="preview-overlay" id="previewOverlay">
   <div class="preview-card">
     <div class="preview-img-wrap"></div>
@@ -571,9 +598,13 @@ const WEEK_CHARS = '日一二三四五六';
 
 let data = { version: 1, days: {} };
 let viewDate = new Date();
-let activeDate = null;
+let activeDate = null;  // 当前打开抽屉的日期
 let selColor = null;
 let selShape = null;
+
+// 状态：当前编辑的故事
+let storyDateKey = null;
+let storyIndex = -1;
 
 function loadData() {
   try {
@@ -588,10 +619,9 @@ function saveData() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) { alert('保存失败'); }
 }
 
-/* 等待页逻辑 - 均匀错落分布，尺寸加大，数量增多 */
+/* 等待页逻辑 */
 function initWelcomeBg() {
   const bg = $('#welcomeBg');
-  // 增加数量：采用 4行 x 5列 的网格，共 20 个图形
   const rows = 4;
   const cols = 5;
   const count = rows * cols;
@@ -603,36 +633,28 @@ function initWelcomeBg() {
     const el = document.createElement('div');
     el.className = 'bg-float-item';
     
-    // 🚀 尺寸再次加大：80px - 220px 之间
     const size = 80 + Math.random() * 140;
     el.style.width = size + 'px';
     el.style.height = size + 'px';
     
-    // 计算当前图形所在的网格行列
     const colIdx = i % cols;
     const rowIdx = Math.floor(i / cols);
     
-    // 计算网格中心点的百分比位置
-    // 例如第一列中心在 10%，第二列在 30%... 以此类推
     let leftPct = ((colIdx + 0.5) / cols) * 100;
     let bottomPct = ((rowIdx + 0.5) / rows) * 100;
     
-    // 在各自网格中心的基础上，随机偏移 ±40%（但不会越界到旁边的格子里）
     const shiftX = (Math.random() - 0.5) * (80 / cols); 
     const shiftY = (Math.random() - 0.5) * (80 / rows);
     
     leftPct += shiftX;
     bottomPct += shiftY;
     
-    // 应用位置
     el.style.left = leftPct + '%';
     el.style.bottom = bottomPct + '%';
     
-    // 随机旋转角度
     const rot = (Math.random() - 0.5) * 90;
     el.style.setProperty('--base-rot', rot + 'deg');
     
-    // 随机动画延迟和时长
     el.style.animationDelay = (Math.random() * -8) + 's';
     el.style.animationDuration = (6 + Math.random() * 6) + 's';
     
@@ -697,6 +719,10 @@ function renderDayView() {
       
       const el = document.createElement('div');
       el.className = 'gallery-item';
+      if (st.story && st.story.trim()) {
+        el.classList.add('has-story');
+      }
+      
       el.style.left = x + 'px';
       el.style.top = y + 'px';
       el.style.animationDelay = animDelay;
@@ -711,7 +737,13 @@ function renderDayView() {
       };
       
       el.appendChild(img);
-      el.onclick = (e) => { e.stopPropagation(); openDrawer(dateKey); };
+      
+      // 🌟 点击主页贴纸，打开故事弹窗
+      el.onclick = (e) => { 
+        e.stopPropagation(); 
+        openStoryModal(dateKey, i); 
+      };
+      
       gallery.appendChild(el);
     });
   }
@@ -771,6 +803,9 @@ function renderDayStickers() {
 
     const name = document.createElement('span');
     name.textContent = shapeObj(st.shape)?.name || st.shape;
+    // 点击抽屉列表里的名称也能看故事
+    name.style.cursor = 'pointer';
+    name.onclick = () => { openStoryModal(activeDate, idx); };
 
     const del = document.createElement('button');
     del.className = 'si-del';
@@ -927,7 +962,8 @@ function updateUI() {
 function addSticker() {
   if (!activeDate || !selColor || !selShape) return;
   if (!data.days[activeDate]) data.days[activeDate] = [];
-  data.days[activeDate].push({ shape: selShape, color: selColor, t: Date.now() });
+  // 加上 story 初始字段
+  data.days[activeDate].push({ shape: selShape, color: selColor, t: Date.now(), story: "" });
   saveData();
   renderDayStickers();
   renderDayView();
@@ -946,7 +982,71 @@ function removeSticker(idx) {
   updateUI();
 }
 
-/* 明信片生成 */
+/* =========================================================
+   故事弹窗逻辑
+   ========================================================= */
+function openStoryModal(dateKey, index) {
+  const list = data.days[dateKey] || [];
+  const st = list[index];
+  if (!st) return;
+
+  storyDateKey = dateKey;
+  storyIndex = index;
+
+  const [y, m, d] = dateKey.split('-').map(Number);
+  const week = WEEK_CHARS[new Date(y, m - 1, d).getDay()];
+
+  // 设置 UI 数据
+  $('#storyTitle').textContent = shapeObj(st.shape)?.name || st.shape;
+  $('#storyDate').textContent = `${y}.${pad2(m)}.${pad2(d)} 周${week}`;
+  
+  const iconBox = $('#storyIcon');
+  iconBox.innerHTML = '';
+  const img = new Image();
+  img.src = imgSrc(st.color, st.shape);
+  img.onerror = () => { iconBox.textContent = '?'; };
+  iconBox.appendChild(img);
+
+  const input = $('#storyInput');
+  // 兼容老数据，如果没有 story 字段，就默认为空
+  input.value = st.story || ''; 
+  
+  $('#storyOverlay').classList.add('show');
+  document.body.classList.add('no-scroll');
+
+  // 延迟一点点聚焦，防止手机端键盘弹起过于生硬
+  setTimeout(() => input.focus(), 300);
+}
+
+function closeStoryModal() {
+  $('#storyOverlay').classList.remove('show');
+  document.body.classList.remove('no-scroll');
+  storyDateKey = null;
+  storyIndex = -1;
+}
+
+function saveStory() {
+  if (!storyDateKey || storyIndex < 0) return;
+  const text = $('#storyInput').value.trim();
+  const list = data.days[storyDateKey];
+  if (list && list[storyIndex]) {
+    list[storyIndex].story = text;
+    saveData();
+    renderDayView(); // 重新渲染主页，更新带故事的小圆点指示器
+    closeStoryModal();
+    toast('故事已保存');
+  }
+}
+
+$('#storyCancel').onclick = closeStoryModal;
+$('#storySave').onclick = saveStory;
+$('#storyOverlay').onclick = (e) => {
+  if (e.target === $('#storyOverlay')) closeStoryModal();
+};
+
+/* =========================================================
+   明信片生成
+   ========================================================= */
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -1176,15 +1276,20 @@ function bindEvents() {
   $('#nextDay').onclick = () => { viewDate.setDate(viewDate.getDate() + 1); renderDayView(); };
   $('#todayBtn').onclick = () => { viewDate = new Date(); renderDayView(); };
 
+  // 点击主页空白处打开抽屉
   $('#galleryWrap').onclick = () => openDrawer(keyOf(viewDate));
+  // 点击右下角悬浮按钮打开抽屉
   $('#fabAdd').onclick = (e) => { e.stopPropagation(); openDrawer(keyOf(viewDate)); };
+  // 导出按钮
   $('#exportBtn').onclick = (e) => { e.stopPropagation(); openPostcardPreview(keyOf(viewDate)); };
 
   $('#closeDrawer').onclick = closeDrawer;
   $('#overlay').onclick = closeDrawer;
+  
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      if ($('#previewOverlay').classList.contains('show')) hidePreview();
+      if ($('#storyOverlay').classList.contains('show')) closeStoryModal();
+      else if ($('#previewOverlay').classList.contains('show')) hidePreview();
       else if (activeDate) closeDrawer();
     }
   });
